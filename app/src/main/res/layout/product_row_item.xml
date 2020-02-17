@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_height="wrap_content"
+    android:padding="2dp">
+
+    <ImageView
+        android:id="@+id/productIV"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:src="@drawable/img"/>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="3.5"
+        android:layout_marginLeft="20dp">
+
+        <TextView
+            android:id="@+id/nameTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="83dp"
+            android:layout_marginTop="4dp"
+            android:padding="10dp"
+            android:text="Name"
+            android:textAlignment="center"
+            android:textColor="#111"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/priceTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/nameTV"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="81dp"
+            android:layout_marginTop="6dp"
+            android:paddingLeft="15dp"
+            android:paddingTop="5dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="10dp"
+            android:text="500.0" />
+
+        <TextView
+            android:id="@+id/manufacturerTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/priceTV"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="0dp"
+            android:paddingLeft="15dp"
+            android:paddingTop="5dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="10dp"
+            android:text="manufacturer" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/manufacturerTV"
+            android:layout_marginStart="31dp"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:text="add to cart"
+            android:textStyle="bold"
+            android:layout_toLeftOf="@id/cartIV"/>
+
+        <ImageView
+            android:id="@+id/cartIV"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/manufacturerTV"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="72dp"
+            android:src="@drawable/cart" />
+
+        <View
+            android:background="#bfbfbf"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"/>
+
+    </RelativeLayout>
+</LinearLayout>
