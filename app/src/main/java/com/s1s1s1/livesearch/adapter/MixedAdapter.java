@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,9 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.s1s1s1.livesearch.R;
 import com.s1s1s1.livesearch.models.Footer;
-import com.s1s1s1.livesearch.models.Header;
 import com.s1s1s1.livesearch.models.Product;
 import com.s1s1s1.livesearch.models.RecyclerViewItem;
+import com.s1s1s1.livesearch.models.Slider;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -26,6 +29,8 @@ public class MixedAdapter extends RecyclerView.Adapter {
 
     //Declare List of Recyclerview Items
     private List<RecyclerViewItem> recyclerViewItems;
+
+    private List<Slider> sliders=new ArrayList<>();
     //Header Item Type
     private static final int HEADER_ITEM = 0;
     //Footer Item Type
@@ -33,6 +38,8 @@ public class MixedAdapter extends RecyclerView.Adapter {
     ////Food Item Type
     private static final int PRODUCT_ITEM = 2;
     private Context context;
+
+    private Slider slider=new Slider();
 
     public MixedAdapter(List<RecyclerViewItem> recyclerViewItems, Context context) {
         this.recyclerViewItems = recyclerViewItems;
@@ -65,11 +72,10 @@ public class MixedAdapter extends RecyclerView.Adapter {
         //Check holder instance to populate data  according to it
         if (holder instanceof HeaderHolder) {
             HeaderHolder headerHolder = (HeaderHolder) holder;
-            Header header = (Header) recyclerViewItem;
-            //set data
-            headerHolder.texViewHeaderText.setText(header.getHeaderText());
-            headerHolder.textViewCategory.setText(header.getCategory());
-            Picasso.get().load(header.getImageUrl()).into(headerHolder.imageViewHeader);
+            for (Slider s: sliders){
+                headerHolder.setImageInFlipr(s);
+            }
+            Log.e("if header", "onBindViewHolder: "+slider.getSliderImage() );
 
         } else if (holder instanceof FooterHolder) {
             FooterHolder footerHolder = (FooterHolder) holder;
@@ -80,14 +86,22 @@ public class MixedAdapter extends RecyclerView.Adapter {
             Picasso.get().load(footer.getImageUrl()).into(footerHolder.imageViewFooter);
 
         } else if (holder instanceof ProductItemHolder) {
-            ProductItemHolder productItemHolder = (ProductItemHolder) holder;
-
+            final ProductItemHolder productItemHolder = (ProductItemHolder) holder;
             Product product = (Product) recyclerViewItem;
-
             productItemHolder.nameTV.setText(product.getName());
             productItemHolder.priceTV.setText(product.getPrice());
             productItemHolder.manufactureTv.setText(product.getManufacturer());
-            Picasso.get().load(product.getImage()).into(productItemHolder.imageView);
+            Picasso.get().load(product.getImage()).into(productItemHolder.imageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    productItemHolder.progressBar.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    productItemHolder.progressBar.setVisibility(View.GONE);
+                }
+            });
 
         }
     }
@@ -97,7 +111,7 @@ public class MixedAdapter extends RecyclerView.Adapter {
         //here we can set view type
         RecyclerViewItem recyclerViewItem = recyclerViewItems.get(position);
         //if its header then return header item
-        if (recyclerViewItem instanceof Header)
+        if (recyclerViewItem instanceof Slider)
             return HEADER_ITEM;
             //if its Footer then return Footer item
         else if (recyclerViewItem instanceof Footer)
@@ -116,10 +130,11 @@ public class MixedAdapter extends RecyclerView.Adapter {
     }
 
 
-    //Food item holder
+    //product item holder
     private class ProductItemHolder extends RecyclerView.ViewHolder {
         private ImageView imageView;
         private TextView nameTV, priceTV, manufactureTv;
+        private ProgressBar progressBar;
 
         ProductItemHolder(View itemView) {
             super(itemView);
@@ -127,19 +142,35 @@ public class MixedAdapter extends RecyclerView.Adapter {
             nameTV = itemView.findViewById(R.id.nameTV);
             priceTV = itemView.findViewById(R.id.priceTV);
             manufactureTv = itemView.findViewById(R.id.manufacturerTV);
+            progressBar = itemView.findViewById(R.id.progress);
         }
     }
 
     //header holder
     private class HeaderHolder extends RecyclerView.ViewHolder {
         TextView texViewHeaderText, textViewCategory;
-        ImageView imageViewHeader;
+        ViewFlipper viewFlipper;
+
 
         HeaderHolder(View itemView) {
             super(itemView);
             texViewHeaderText = itemView.findViewById(R.id.texViewHeaderText);
             textViewCategory = itemView.findViewById(R.id.textViewCategory);
-            imageViewHeader = itemView.findViewById(R.id.imageViewHeader);
+            viewFlipper = itemView.findViewById(R.id.flipper);
+
+            Log.e("if header", "HeaderHolder: "+sliders.size() );
+
+        }
+
+        private void setImageInFlipr(Slider slider) {
+            ImageView image=new ImageView(itemView.getContext());
+            String imgUrl=slider.getSliderImage();
+            Picasso.get().load(imgUrl).fit().centerCrop().into(image);
+            viewFlipper.setFlipInterval(2000);
+//            viewFlipper.setInAnimation(context, context.getResources(Android.Resource.Animation.SlideInLeft));
+//            viewFlipper.setOutAnimation();
+            viewFlipper.addView(image);
+            viewFlipper.startFlipping();
         }
     }
 
@@ -160,15 +191,15 @@ public class MixedAdapter extends RecyclerView.Adapter {
 
 
         List<RecyclerViewItem> recyclerViewItems = new ArrayList<>();
-        Header header = new Header("Welcome To Food Express", "Non-Veg Menu",
-                "https://cdn.pixabay.com/photo/2017/09/30/15/10/pizza-2802332_640.jpg");
-        //add header
-        recyclerViewItems.add(header);
 
+        //add header
+        recyclerViewItems.add(slider);
+
+        //add products
         recyclerViewItems.addAll(products);
 
-        Footer footer = new Footer("Your diet is a bank account. Good food choices are good investments.",
-                "Bethenny Frankel", "https://cdn.pixabay.com/photo/2016/12/26/17/28/background-1932466_640.jpg");
+        Footer footer = new Footer("Your choice is our priority.",
+                "Copyright @ E-Sellers 2020", "http://192.168.0.103/searching/slider/si_1580931161.jpg");
         //add footer
         recyclerViewItems.add(footer);
 
@@ -179,25 +210,12 @@ public class MixedAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
-
-    public void updateList(Product products) {
-
-
+    public void updateSlider(List<Slider> sliders){
         List<RecyclerViewItem> recyclerViewItems = new ArrayList<>();
-        Header header = new Header("Welcome To Food Express", "Non-Veg Menu",
-                "https://cdn.pixabay.com/photo/2017/09/30/15/10/pizza-2802332_640.jpg");
-        //add header
-        recyclerViewItems.add(header);
-
-        recyclerViewItems.add(products);
-
-        Footer footer = new Footer("Your diet is a bank account. Good food choices are good investments.",
-                "Bethenny Frankel", "https://cdn.pixabay.com/photo/2016/12/26/17/28/background-1932466_640.jpg");
-        //add footer
-        recyclerViewItems.add(footer);
-
-
+        this.slider=sliders.get(0);
+        recyclerViewItems.add(slider);
         this.recyclerViewItems = recyclerViewItems;
+        this.sliders=sliders;
 
         Log.e("", "updateList: " + recyclerViewItems.size());
         notifyDataSetChanged();

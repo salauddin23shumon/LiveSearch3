@@ -3,6 +3,7 @@ package com.s1s1s1.livesearch.networking;
 
 import com.s1s1s1.livesearch.models.Contact;
 import com.s1s1s1.livesearch.models.Product;
+import com.s1s1s1.livesearch.models.Slider;
 
 import java.util.List;
 
@@ -26,4 +27,10 @@ public interface ApiInterface {
 
     @GET("getproducts2.php")
     Call<List<Product>> getProducts2( @Query("key") String keyword);
+
+
+    @GET("getslider.php")
+    Call<List<Slider>> getSlider();
+
+
 }
